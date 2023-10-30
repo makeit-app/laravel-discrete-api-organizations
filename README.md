@@ -5,16 +5,8 @@ Inscludes: organization->workspaces management
 
 ## Requirements
 
-`composer require make-it-app/laravel-user-roles` - User's Role Subsystem.<br>
-Just visit the https://github.com/makeit-app/laravel-user-roles and follow installation instructions.<br>
-This package must be installed and configured manually AS ROOT PACKAGE before this one for the Laravel project, with all due care.
-
 `composer require make-it-app/laravel-discrete-api-base` - Laravel API for discrete Frontend. Base Version.
 Just visit the https://github.com/makeit-app/laravel-discrete-api-base and follow installation instructions.<br>
-This package must be installed and configured manually AS ROOT PACKAGE before this one for the Laravel project, with all due care.
-
-`composer require make-it-app/laravel-discrete-api-profile` - Laravel API for discrete Frontend. Profile Version.
-Just visit the https://github.com/makeit-app/laravel-discrete-api-profile and follow installation instructions.<br>
 This package must be installed and configured manually AS ROOT PACKAGE before this one for the Laravel project, with all due care.
 
 ## Installation
@@ -23,10 +15,9 @@ This package must be installed and configured manually AS ROOT PACKAGE before th
 
 ## Setup
 
-`php artisan vendor:publish --provider="MakeIT\\DiscreteApi\\Organizations\\Providers\\DiscreteApiOrganizationsServiceProvider" --tag="migrations"` - if you plan to modify migrations
-`php artisan vendor:publish --provider="MakeIT\\DiscreteApi\\Organizations\\Providers\\DiscreteApiOrganizationsServiceProvider" --tag="lang"` - if you plan modyfy localization files
+`php artisan vendor:publish --provider="MakeIT\\DiscreteApi\\Organizations\\Providers\\DiscreteApiOrganizationsServiceProvider" --tag="install"`
 
-**THEN**
+**THEN** (soon)
 
 `php artisan makeit:discreteapi:organizations:install` - run the installer and follow the instructions
 
@@ -36,11 +27,23 @@ This package must be installed and configured manually AS ROOT PACKAGE before th
 
 ## Routes
 
-- GET `api/user/organizations/current` - get currently selected organization
-- PUT `api/user/organizations/current` - update currently selected organization
+- GET    `api/user/organizations/current` - get currently selected organization
+- PUT    `api/user/organizations/current` - update currently selected organization
 - DELETE `api/user/organizations/current` - delete currently selected organization
-- PUT `api/user/organizations/switch` - switch to the user to the organization
-- PUT `api/user/organizations/invite` - invite a users to the organization
-- GET `api/user/organizations/list` - list all organizations where user is registered
+- PUT    `api/user/organizations/switch` - switch to a selected organization
+- GET    `api/user/organizations/list` - list all organizations where user is registered
+- GET    `api/user/organizations/workspaces/current` - get currently selected workspace with their content
+- PUT    `api/user/organizations/workspaces/current` - update currently selected workspace
+- DELETE `api/user/organizations/workspaces/current` - delete currently selected workspace
+- PUT    `api/user/organizations/workspaces/switch` - switch to a selected workspace
+- GET    `api/user/organizations/list` - list all organization workspaces
+- GET    `api/user/organizations/members` - members list and what they do
+- POST   `api/user/organizations/members/invite` - invite member(s) to the currently selected organization
+- GET    `api/user/organizations/members/accept/{USER_UUID}/{ORGANIZATION_UUID}?signature={SIGNATURE}` - signed:relative url to accept membership
+- GET    `api/user/organizations/members/decline/{USER_UUID}/{ORGANIZATION_UUID}?signature={SIGNATURE}` - signed:relative url to decline membership
+- PUT    `api/user/organizations/members` - update member in the currently selected organization
+- DELETE `api/user/organizations/members/{UUID}` - kick member from the currently selected organization
 
-Getting organizations data via middleware `src/Http/Middleware/PreloadUserOrganizations.php` at `api/user` route
+Getting organizations data via middleware without content (skeleton)<br>
+`\MakeIT\DiscreteApi\Organizations\Http\Middleware\PreloadUserOrganizations::class`
+this middleware will append to the `request()->user()` structured data via `->load()` method.

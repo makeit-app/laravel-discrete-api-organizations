@@ -1,44 +1,42 @@
 {
-  "name": "make-it-app/laravel-discrete-api-organizations",
-  "description": "Organizations (Teams) for Laravel with multiple Workspaces for each individual organization. Support for monetization limitations with helper classes and configuration.",
-  "keywords": ["laravel","organization","organizations","workspace","workspaces","teams","team"],
-  "license": "MIT",
-  "autoload": {
-    "psr-4": {
-      "MakeIT\\DiscreteApi\\Organizations\\": "src/"
-    }
-  },
-  "authors": [
-    {
-      "name": "Stanislav Kabin",
-      "email": "ioffline@make-it.app"
-    }
-  ],
-  "minimum-stability": "dev",
-  "require": {
-    "php": "^8.1|^8.2|^8.3",
-    "laravel/framework": "^10.10",
-    "make-it-app/laravel-discrete-api-base": "dev-master|^1.0",
-    "make-it-app/laravel-discrete-api-profile": "dev-master|^1.0",
-    "make-it-app/utils": "dev-master|^1.0"
-  },
-  "require-dev": {
-    "laravel/pint": "^1.0"
-  },
-  "extra": {
-    "branch-alias": {
-      "dev-master": "0.x.x-dev"
+    "name": "make-it-app/laravel-discrete-api-organizations",
+    "description": "Organizations (Teams) for Laravel with multiple Workspaces for each individual organization. Support for monetization limitations with helper classes and configuration.",
+    "keywords": ["laravel","organization","organizations","workspace","workspaces","teams","team"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Stanislav Kabin",
+            "email": "ioffline@make-it.app"
+        }
+    ],
+    "require": {
+        "php": "^8.1|^8.2|^8.3",
+        "laravel/framework": "^10.10",
+        "make-it-app/laravel-discrete-api-base": "@dev|^1.0",
+        "make-it-app/utils": "@dev|^1.0"
     },
-    "laravel": {
-      "providers": [
-        "MakeIT\\DiscreteApi\\Organizations\\Providers\\DiscreteApiOrganizationsServiceProvider"
-      ],
-      "aliases": {
+    "require-dev": {
+        "laravel/pint": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "MakeIT\\DiscreteApi\\Organizations\\": "src/"
+        }
+    },
+    "extra": {
+      "branch-alias": {
+          "dev-master": "0.x-dev"
+      },
+      "laravel": {
+          "providers": [
+              "MakeIT\\DiscreteApi\\Organizations\\Providers\\DiscreteApiOrganizationsServiceProvider"
+          ]
       }
-    }
-  },
-  "config": {
-    "sort-packages": true
-  },
-  "prefer-stable": true
+    },
+    "config": {
+        "sort-packages": true,
+        "optimize-autoloader": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }

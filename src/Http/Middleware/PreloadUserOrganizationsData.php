@@ -1,21 +1,39 @@
 <?php
 
-namespace MakeIT\DiscreteApi\Profile\Http\Middleware;
+namespace MakeIT\DiscreteApi\Organizations\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class PreloadUserProfileData
+class PreloadUserOrganizationsData
 {
     public function handle(Request $request, Closure $next): Response
     {
         if (auth()->check()) {
             $request->user()->load([
-                'profile.organization',
-                'profile.organization.workspace',
-                'profile.organizations',
-                'profile.organizations.workspaces',
+                'profile' => function ($q) {
+                    return $q->with([
+                        'organization' => function ($q) {
+                            return $q->with([
+                                'slots',
+                                'workspaces' => function ($q) {
+                                    return $q->ordered();
+                                },
+                            ]);
+                        },
+                        'workspace',
+                    ]);
+                },
+                'organization_slots',
+                'organizations' => function ($q) {
+                    return $q->ordered()->with([
+                        'slots',
+                        'workspaces' => function ($q) {
+                            return $q->ordered();
+                        },
+                    ]);
+                },
             ]);
         }
 
