@@ -13,9 +13,7 @@ class PreloadUserProfileData
         if (auth()->check()) {
             $request->user()->load([
                 'profile.organization',
-                'profile.organization.workspace',
-                'profile.organizations',
-                'profile.organizations.workspaces',
+                'organizations.workspaces',
             ]);
         }
 
