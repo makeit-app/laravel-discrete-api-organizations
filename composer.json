@@ -39,5 +39,22 @@
         "optimize-autoloader": true
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "repositories": {
+        "utils": {
+            "type": "path", "symlink": true, "url": "../utils/"
+        },
+        "user-roles": {
+            "type": "path", "symlink": true, "url": "../laravel-user-roles/"
+        },
+        "discrete-api-base": {
+            "type": "path", "symlink": true, "url": "../laravel-discrete-api-base/"
+        },
+        "discrete-api-profile": {
+            "type": "path", "symlink": true, "url": "../laravel-discrete-api-profile/"
+        },
+        "discrete-api-organizations": {
+            "type": "path", "symlink": true, "url": "../laravel-discrete-api-organizations/"
+        }
+    }
 }

@@ -4,6 +4,7 @@ namespace MakeIT\DiscreteApi\Organizations\Console\Commands;
 
 use Exception;
 use Illuminate\Console\Command;
+use MakeIT\DiscreteApi\Base\Helpers\DiscreteApiHelpers;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\PsrPrinter;
@@ -130,86 +131,12 @@ class InstallDiscreteApiOrganizationsCommand extends Command
      */
     protected function getClasses(): array
     {
-        $dirs = [
-            'actions' => realpath(__DIR__ . '/../../Actions'),
-            'controllers' => realpath(__DIR__ . '/../../Http/Controllers'),
-            'middleware' => realpath(__DIR__ . '/../../Http/Middleware'),
-            'models' => realpath(__DIR__ . '/../../Models'),
-            'notifications' => realpath(__DIR__ . '/../../Notifications'),
-            'observers' => realpath(__DIR__ . '/../../Observers'),
-            'policies' => realpath(__DIR__ . '/../../Policies'),
-            'rules' => realpath(__DIR__ . '/../../Rules'),
-            'traits' => realpath(__DIR__ . '/../../Traits'),
-        ];
-        $namespace = $this->compute_namespace();
-        $namespaces = [
-            'actions' => $namespace . 'Actions',
-            'controllers' => $namespace . 'Http\Controllers',
-            'middleware' => $namespace . 'Http\Middleware',
-            'models' => $namespace . 'Models',
-            'notifications' => $namespace . 'Notifications',
-            'observers' => $namespace . 'Observers',
-            'policies' => $namespace . 'Policies',
-            'rules' => $namespace . 'Rules',
-            'traits' => $namespace . 'Traits',
-        ];
         $return = [];
-        /**
-         * Scan directory for .php files and returns array of class names with their namespaces
-         *
-         * @param string $type
-         * @param string $dir
-         * @return array
-         */
-        $scanDir = function (string $type, string $dir) use ($namespaces) {
-            if (!is_dir($dir)) {
-                return [];
-            }
-            $return = [];
-            $h = opendir($dir);
-            while (false !== ($entry = readdir($h))) {
-                if (is_file($dir . '/' . $entry)) {
-                    $path = $dir . '/' . $entry;
-                    $temp = [
-                        'trait' => str_replace('.php', null, basename($path)),
-                        'classname' => str_replace('.php', null, basename($path)),
-                        'model' => null,
-                        'model_namespace' => null,
-                        'use' => preg_replace('/^\\\/', null, $namespaces[$type] . '\\' . str_replace('.php', null, basename($path))),
-                        'as' => 'DiscreteApiOrganizations' . str_replace('.php', null, basename($path)),
-                        'ns' => preg_replace('/^\\\/', null, $this->_config['namespaces']['app'] . str_replace($this->compute_namespace(), null, $namespaces[$type]) . '\\DiscreteApi\\Organizations'),
-                        'app_model' => null,
-                        'app_path' => app_path(str_replace([$this->compute_namespace(), '\\'], [null, '/'], $namespaces[$type]) . '/DiscreteApi/Organizations'),
-                        'app_filename' => app_path(str_replace([$this->compute_namespace(), '\\'], [null, '/'], $namespaces[$type]) . '/DiscreteApi/Organizations/' . basename($path)),
-                        'package_path' => $path,
-                    ];
-                    switch ($type) {
-                        case 'traits':
-                            break;
-                        case 'observers':
-                            unset($temp['trait']);
-                            $temp['model_namespace'] = str_replace('\\Observers\\', '\\Models\\', 'App\\Models\\DiscreteApi\\Organizations\\');
-                            $temp['model'] = preg_replace('/^\\\/', null, str_replace('\\Observers\\', '\\Models\\', ($namespaces[$type] . '\\' . str_replace('Observer.php', null, basename($path)))));
-                            $temp['app_model'] = str_replace('\\Observers\\', '\\Models\\', 'App\\Models\\DiscreteApi\\Organizations\\') . str_replace('Observer.php', null, basename($path));
-                            break;
-                        case 'policies':
-                            unset($temp['trait']);
-                            $temp['model_namespace'] = str_replace('\\Policies\\', '\\Models\\', 'App\\Models\\DiscreteApi\\Organizations\\');
-                            $temp['model'] = preg_replace('/^\\\/', null, str_replace('\\Observers\\', '\\Models\\', ($namespaces[$type] . '\\' . str_replace('Observer.php', null, basename($path)))));
-                            $temp['app_model'] = str_replace('\\Observers\\', '\\Models\\', 'App\\Models\\DiscreteApi\\Organizations\\') . str_replace('Observer.php', null, basename($path));
-                            break;
-                        default:
-                            unset($temp['trait']);
-                            break;
-                    }
-                    $return[] = $temp;
-                }
-            }
-            closedir($h);
-            return $return;
-        };
+        $dirs = DiscreteApiHelpers::dirs(__DIR__ . '/../../');
+        $namespace = DiscreteApiHelpers::compute_namespace($this->_config);
+        $namespaces = DiscreteApiHelpers::namespaces($namespace);
         foreach ($dirs as $type => $dir) {
-            $return[$type] = $scanDir($type, $dir);
+            $return[$type] = DiscreteApiHelpers::scanDirs($type, $dir, $namespace, $namespaces, $this->_config, 'Organizations');
         }
         return $return;
     }
@@ -217,7 +144,7 @@ class InstallDiscreteApiOrganizationsCommand extends Command
     /**
      * Generates source code files in to App namespace
      */
-    protected function generate(string $type, array $generated_classes): void
+    function generate(string $type, array $generated_classes): void
     {
         if (!empty($generated_classes['observers'])) {
             $this->_config['observersToRegister'] = [];
@@ -228,105 +155,10 @@ class InstallDiscreteApiOrganizationsCommand extends Command
         $printer = new PsrPrinter();
         foreach ($generated_classes as $class) {
             if ($type == 'traits') {
-                $this->_generateTrait($class, $printer);
+                $this->_config = DiscreteApiHelpers::generateTrait($this, $class, $printer, $type, 'Organizations', $this->_config);
             } else {
-                $this->_generate($class, $printer, $type);
+                $this->_config = DiscreteApiHelpers::generate($this, $class, $printer, $type, 'Organizations', $this->_config);
             }
-        }
-    }
-
-    /**
-     * Generate trait for descendant and store it in app filesystem
-     */
-    protected function _generateTrait(array $class, PsrPrinter $printer): void
-    {
-        $ns = new PhpNamespace($class['ns']);
-        $target = TraitType::fromCode(file_get_contents($class['package_path']));
-        /** @noinspection PhpParamsInspection */
-        $ns->add($target);
-        $trait = $printer->setTypeResolving(false)->printNamespace($ns);
-        $trait = str_replace([config('discreteapiorganizations.namespaces.package') . 'Models\\'], [config('discreteapiorganizations.namespaces.app') . 'Models\\DiscreteApi\\Organizations\\'], $trait);
-        if (!is_dir($class['app_path']) && !is_file($class['app_path']) && !is_link($class['app_path'])) {
-            try {
-                mkdir($class['app_path'], 0755, true);
-            } catch (Exception $e) {
-                $this->error($class['app_path']);
-                $this->error('Is not writeable!');
-                $this->error('Please check path!');
-                $this->error($e->getMessage());
-                return;
-            }
-        }
-        $f = fopen($class['app_filename'], 'w');
-        fwrite($f, "<?php\n\n" . $trait);
-        fclose($f);
-    }
-
-    /**
-     * Generate class for descendant and store it in app filesystem
-     */
-    protected function _generate(array $class, PsrPrinter $printer, string $type = null): void
-    {
-        $ns = new PhpNamespace($class['ns']);
-        $target = ClassType::fromCode(file_get_contents($class['package_path']));
-        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
-        $target->setFinal()->setExtends($class['as']);
-        if ($type == 'models') {
-            /** @noinspection PhpUndefinedMethodInspection */
-            $tmp_traits = $target->getTraits();
-            if (!empty($tmp_traits)) {
-                $traits = [];
-                /** @noinspection PhpUndefinedMethodInspection */
-                $target->setTraits([]);
-                foreach ($tmp_traits as $tr) {
-                    $_bn = class_basename($tr->getName());
-                    $_fn = str_replace('\\' . $_bn, null, $tr->getName());
-                    $_fn = (preg_match("/^\\\/", $tr->getName()) ? null : '\\') . $_fn;
-                    $traits[] = ['name' => $_bn,'path' => str_replace(config('discreteapiorganizations.namespaces.package'), config('discreteapiorganizations.namespaces.app'), $_fn) . '\\DiscreteApi\\Organizations\\'];
-                }
-                unset($tmp_traits, $tr);
-                if (!empty($traits)) {
-                    foreach ($traits as $tr) {
-                        /** @noinspection PhpUndefinedMethodInspection */
-                        $target->addTrait($tr['name']);
-                    }
-                    unset($tr);
-                }
-            }
-        }
-        /** @noinspection PhpParamsInspection */
-        $ns->add($target);
-        if (!empty($traits)) {
-            foreach ($traits as $tr) {
-                $ns->addUse($tr['path'] . $tr['name']);
-            }
-        }
-        if (!empty($class['use']) && !empty($class['as'])) {
-            $ns->addUse($class['use'], $class['as']);
-        }
-        if (!is_dir($class['app_path']) && !is_file($class['app_path']) && !is_link($class['app_path'])) {
-            try {
-                mkdir($class['app_path'], 0755, true);
-            } catch (Exception $e) {
-                $this->error($class['app_path']);
-                $this->error('Is not writeable!');
-                $this->error('Please check path!');
-                $this->error($e->getMessage());
-                return;
-            }
-        }
-        $f = fopen($class['app_filename'], 'w');
-        fwrite($f, "<?php\n\n" . $printer->setTypeResolving(false)->printNamespace($ns));
-        fclose($f);
-        switch ($type) {
-            case 'observers':
-                $fqcn = $class['app_model'];
-                $this->_config['observersToRegister'][$fqcn] = $class['ns'] . '\\' . $class['classname'];
-                break;
-            case 'policies':
-                $fqcn = $class['app_model'];
-                $this->_config['policiesToRegister'][$fqcn] = $class['ns'] . '\\' . $class['classname'];
-                break;
         }
     }
 
@@ -337,14 +169,5 @@ class InstallDiscreteApiOrganizationsCommand extends Command
     {
         $content = VarExporter::export($this->_config);
         file_put_contents(config_path('discreteapiorganizations.php'), "<?php\n\nreturn " . $content . ";\n");
-    }
-
-    protected function compute_namespace(): string
-    {
-        if (config('discreteapiorganizations.route_namespace') === 'app') {
-            return config('discreteapiorganizations.namespaces.app', '\\App\\');
-        }
-
-        return config('discreteapiorganizations.namespaces.package', '\\MakeIT\\DiscreteApi\\Organizations\\');
     }
 }
