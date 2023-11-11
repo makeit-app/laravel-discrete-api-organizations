@@ -10,13 +10,11 @@ return new class () extends Migration {
      */
     public function up(): void
     {
-        Schema::create('profiles', function (Blueprint $table) {
-            $table->id();
+        Schema::create('pivot_organizations_users', function (Blueprint $table) {
+            $table->foreignUuid('organization_id')->index()->references('id')->on('organizations')->cascadeOnDelete();
             $table->foreignUuid('user_id')->index()->references('id')->on('users')->cascadeOnDelete();
-            $table->char('locale', 2)->index()->default('en');
-            $table->string('lastname')->index()->nullable();
-            $table->string('firstname')->index()->nullable();
-            $table->string('avatar_path')->index()->nullable();
+            $table->integer('role')->index()->nullable();
+            $table->unique(['organization_id', 'user_id']);
         });
     }
 
@@ -25,6 +23,6 @@ return new class () extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('profiles');
+        Schema::dropIfExists('pivot_organizations_users');
     }
 };

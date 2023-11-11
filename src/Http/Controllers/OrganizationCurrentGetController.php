@@ -5,15 +5,15 @@ namespace MakeIT\DiscreteApi\Organizations\Http\Controllers;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use MakeIT\DiscreteApi\Organizations\Contracts\OrganizationsCurrentDeleteContract;
+use MakeIT\DiscreteApi\Organizations\Contracts\OrganizationsCurrentGetContract;
 
-class OrganizationCurrentDeleteController extends BaseDiscreteApiOrganizationsController
+class OrganizationCurrentGetController extends BaseDiscreteApiOrganizationsController
 {
     /**
      * @throws Exception
      */
     public function __invoke(Request $request): JsonResponse
     {
-        return app(OrganizationsCurrentDeleteContract::class)->handle($request->user());
+        return app(OrganizationsCurrentGetContract::class)->handle($request->user());
     }
 }

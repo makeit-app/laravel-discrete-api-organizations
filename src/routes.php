@@ -9,11 +9,11 @@ Route::middleware('auth:sanctum')->group(function () {
         // get list
         Route::get('/list', 'OrganizationsListController');
         // switch to another
-        Route::put('/switch', 'OrganizationSwitchController');
+        Route::put('/switch/{organization}', 'OrganizationSwitchController');
         // CURRENT ORGANIZATION MANIPULATIONS
         Route::prefix('/current')->group(function () {
             // get current
-            Route::get('/', 'OrganizationCurrentController');
+            Route::get('/', 'OrganizationCurrentGetController');
             // update current
             Route::put('/', 'OrganizationCurrentUpdateController');
             // delete current

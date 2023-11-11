@@ -1,12 +1,12 @@
 <?php
 
-namespace MakeIT\DiscreteApi\Profile\Http\Middleware;
+namespace MakeIT\DiscreteApi\Organizations\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class PreloadUserProfileData
+class PreloadUserOrganizationsData
 {
     public function handle(Request $request, Closure $next): Response
     {
