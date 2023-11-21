@@ -111,6 +111,11 @@ class InstallDiscreteApiOrganizationsCommand extends Command
                ? 'use \App\Traits\DiscreteApi\Organizations\HasOrganizations;'
                : 'use \MakeIT\DiscreteApi\Organizations\Traits\HasOrganizations;'
         ));
+        $this->comment('        '.(
+            ($quiz['modify_source_code'])
+               ? 'use \App\Traits\DiscreteApi\Organizations\HasWorkspace;'
+               : 'use \MakeIT\DiscreteApi\Organizations\Traits\HasWorkspace;'
+        ));
         $this->writeNewConfig();
         $this->info('Done.');
         $this->newLine();

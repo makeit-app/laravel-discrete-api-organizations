@@ -10,13 +10,11 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use MakeIT\DiscreteApi\Base\Helpers\DiscreteApiHelpers;
-use MakeIT\DiscreteApi\Organizations\Actions\OrganizationsCurrentDeleteAction;
-use MakeIT\DiscreteApi\Organizations\Actions\OrganizationsCurrentGetAction;
-use MakeIT\DiscreteApi\Organizations\Actions\OrganizationsCurrentUpdateAction;
 use MakeIT\DiscreteApi\Organizations\Console\Commands\InstallDiscreteApiOrganizationsCommand;
 use MakeIT\DiscreteApi\Organizations\Contracts\OrganizationsCurrentDeleteContract;
 use MakeIT\DiscreteApi\Organizations\Contracts\OrganizationsCurrentGetContract;
 use MakeIT\DiscreteApi\Organizations\Contracts\OrganizationsCurrentUpdateContract;
+use MakeIT\DiscreteApi\Organizations\Contracts\OrganizationsListContract;
 use MakeIT\DiscreteApi\Organizations\Models\Organization;
 use MakeIT\DiscreteApi\Organizations\Models\Workspace;
 
@@ -134,9 +132,10 @@ class DiscreteApiOrganizationsServiceProvider extends ServiceProvider
         $actions_namespace = config('discreteapiorganizations.route_namespace') === 'app'
             ? DiscreteApiHelpers::compute_namespace(config('discreteapiorganizations')) . 'Actions\\DiscreteApi\\Organizations\\'
             : DiscreteApiHelpers::compute_namespace(config('discreteapiorganizations')) . 'Actions\\';
-        $this->app->singleton(OrganizationsCurrentGetContract::class, OrganizationsCurrentGetAction::class);
-        $this->app->singleton(OrganizationsCurrentUpdateContract::class, OrganizationsCurrentUpdateAction::class);
-        $this->app->singleton(OrganizationsCurrentDeleteContract::class, OrganizationsCurrentDeleteAction::class);
+        $this->app->singleton(OrganizationsCurrentGetContract::class, $actions_namespace . 'OrganizationsCurrentGetAction');
+        $this->app->singleton(OrganizationsCurrentUpdateContract::class, $actions_namespace . 'OrganizationsCurrentUpdateAction');
+        $this->app->singleton(OrganizationsCurrentDeleteContract::class, $actions_namespace . 'OrganizationsCurrentDeleteAction');
+        $this->app->singleton(OrganizationsListContract::class, $actions_namespace . 'OrganizationsListAction');
     }
 
     /**

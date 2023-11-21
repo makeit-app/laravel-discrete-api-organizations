@@ -12,8 +12,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use MakeIT\Utils\Sorter;
 
 /**
- * {@inheritDoc}
+ *
+ * @property string $id
  * @method static create(array $array)
+ * {@inheritDoc}
  */
 class Organization extends Model
 {
@@ -66,7 +68,10 @@ class Organization extends Model
      *
      * @var array
      */
-    protected $appends = ['role', 'role_id'];
+    protected $appends = [
+        'role',
+        'role_id'
+    ];
 
     /**
      * The "type" of the primary key ID.
@@ -88,14 +93,30 @@ class Organization extends Model
     public function role(): Attribute
     {
         return Attribute::get(function (): ?string {
-            return (isset($this->pivot)) ? config('discreteapiorganizations.roles')[$this->pivot->role] : null;
+            if (isset($this->pivot)) {
+                return config('discreteapiorganizations.roles')[$this->pivot->role];
+            } else {
+                $tmp = request()->user()->organizations()->select(['id', 'organization_id', 'user_id'])->where('organization_id', $this->id)->first();
+                if (!is_null($tmp)) {
+                    return $tmp->role;
+                }
+            }
+            return null;
         });
     }
 
     public function roleId(): Attribute
     {
-        return Attribute::get(function (): ?string {
-            return (isset($this->pivot)) ? $this->pivot->role : null;
+        return Attribute::get(function (): ?int {
+            if (isset($this->pivot)) {
+                return (int)$this->pivot->role;
+            } else {
+                $tmp = request()->user()->organizations()->select(['id', 'organization_id', 'user_id'])->where('organization_id', $this->id)->first();
+                if (!is_null($tmp)) {
+                    return (int)$tmp->role_id;
+                }
+            }
+            return null;
         });
     }
 

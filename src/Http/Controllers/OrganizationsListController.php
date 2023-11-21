@@ -5,6 +5,7 @@ namespace MakeIT\DiscreteApi\Organizations\Http\Controllers;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use MakeIT\DiscreteApi\Organizations\Contracts\OrganizationsListContract;
 
 class OrganizationsListController extends BaseDiscreteApiOrganizationsController
 {
@@ -13,6 +14,6 @@ class OrganizationsListController extends BaseDiscreteApiOrganizationsController
      */
     public function __invoke(Request $request): JsonResponse
     {
-        return app()->handle($request->user());
+        return app(OrganizationsListContract::class)->handle($request->user());
     }
 }

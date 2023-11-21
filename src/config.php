@@ -16,12 +16,18 @@ return [
      * Policies. You are free to specify any full
      * qualifyed namespace to model and policy files
      */
-    'policiesToRegister' => [],
+    'policiesToRegister' => [
+        \MakeIT\DiscreteApi\Organizations\Models\Organization::class => \MakeIT\DiscreteApi\Organizations\Policies\OrganizationPolicy::class,
+        \MakeIT\DiscreteApi\Organizations\Models\Workspace::class => \MakeIT\DiscreteApi\Organizations\Policies\WorkspacePolicy::class,
+    ],
     /**
      * Observers. You are free to specify any full
      * qualifyed namespace to model and policy files
      */
-    'observersToRegister' => [],
+    'observersToRegister' => [
+        \MakeIT\DiscreteApi\Organizations\Models\Organization::class => \MakeIT\DiscreteApi\Organizations\Observers\OrganizationObserver::class,
+        \MakeIT\DiscreteApi\Organizations\Models\Workspace::class => \MakeIT\DiscreteApi\Organizations\Observers\WorkspaceObserver::class,
+    ],
     /**
      * Namespaces for class generator
      */
@@ -49,5 +55,6 @@ return [
         2 => 'admin',
         3 => 'user',
         4 => 'ro',
+        9 => 'invited'
     ]
 ];

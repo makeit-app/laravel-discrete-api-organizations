@@ -12,11 +12,26 @@ class PreloadUserOrganizationsData
     {
         if (auth()->check()) {
             $request->user()->load([
-                'profile.organization',
-                'organizations.workspaces',
+                'profile' => function ($q) {
+                    return $q->with([
+                        'organization' => function ($q) {
+                            return $q->with([
+                                'workspaces' => function ($q) {
+                                    return $q->ordered();
+                                }
+                            ]);
+                        }
+                    ]);
+                },
+                'organizations' => function ($q) {
+                    return $q->ordered()->with([
+                        'workspaces' => function ($q) {
+                            return $q->ordered();
+                        }
+                    ]);
+                }
             ]);
         }
-
         return $next($request);
     }
 }

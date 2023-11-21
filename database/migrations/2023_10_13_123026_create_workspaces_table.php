@@ -12,6 +12,7 @@ return new class () extends Migration {
     {
         Schema::create('workspaces', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            $table->integer(\MakeIT\Utils\Sorter::FIELD)->index()->default(0);
             $table->foreignUuid('organization_id')->index()->references('id')->on('organizations')->cascadeOnDelete();
             $table->string('title')->index();
             $table->boolean('is_default')->index()->default(false);
