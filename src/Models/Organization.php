@@ -11,12 +11,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use MakeIT\Utils\Sorter;
 
-/**
- *
- * @property string $id
- * @method static create(array $array)
- * {@inheritDoc}
- */
 class Organization extends Model
 {
     use SoftDeletes;

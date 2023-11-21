@@ -8,12 +8,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use MakeIT\Utils\Sorter;
 
-/**
- *
- * @property Organization $organization
- * @method static create(array $array)
- * {@inheritDoc}
- */
 class Workspace extends Model
 {
     use SoftDeletes;
