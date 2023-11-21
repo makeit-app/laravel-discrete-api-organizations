@@ -2,13 +2,9 @@
 
 namespace MakeIT\DiscreteApi\Organizations\Console\Commands;
 
-use Exception;
 use Illuminate\Console\Command;
 use MakeIT\DiscreteApi\Base\Helpers\DiscreteApiHelpers;
-use Nette\PhpGenerator\ClassType;
-use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\PsrPrinter;
-use Nette\PhpGenerator\TraitType;
 use Symfony\Component\VarExporter\Exception\ExceptionInterface;
 use Symfony\Component\VarExporter\VarExporter;
 
@@ -149,7 +145,7 @@ class InstallDiscreteApiOrganizationsCommand extends Command
     /**
      * Generates source code files in to App namespace
      */
-    function generate(string $type, array $generated_classes): void
+    public function generate(string $type, array $generated_classes): void
     {
         if (!empty($generated_classes['observers'])) {
             $this->_config['observersToRegister'] = [];

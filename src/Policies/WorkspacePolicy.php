@@ -54,9 +54,9 @@ class WorkspacePolicy
     public function update(User $User, Model $Model): bool
     {
         return $User->hasRole(['super', 'admin', 'support']) || (
-                DiscreteApiOrganizationsHelper::is_member($User, $Model->organization) &&
+            DiscreteApiOrganizationsHelper::is_member($User, $Model->organization) &&
                 DiscreteApiOrganizationsHelper::can_write_organization($User, $Model->organization)
-            );
+        );
     }
 
     /**
@@ -69,9 +69,9 @@ class WorkspacePolicy
     public function delete(User $User, Model $Model): bool
     {
         return $User->hasRole(['super', 'admin', 'support']) || (
-                DiscreteApiOrganizationsHelper::is_member($User, $Model->organization) &&
+            DiscreteApiOrganizationsHelper::is_member($User, $Model->organization) &&
                 DiscreteApiOrganizationsHelper::can_delete_organization($User, $Model->organization)
-            );
+        );
     }
 
     /**

@@ -54,9 +54,9 @@ class OrganizationPolicy
     public function update(User $User, Model $Model): bool
     {
         return $User->hasRole(['super', 'admin', 'support']) || (
-                DiscreteApiOrganizationsHelper::is_member($User, $Model) &&
+            DiscreteApiOrganizationsHelper::is_member($User, $Model) &&
                 DiscreteApiOrganizationsHelper::can_write_organization($User, $Model)
-            );
+        );
     }
 
     /**
@@ -69,9 +69,9 @@ class OrganizationPolicy
     public function delete(User $User, Model $Model): bool
     {
         return $User->hasRole(['super', 'admin', 'support']) || (
-                DiscreteApiOrganizationsHelper::is_member($User, $Model) &&
+            DiscreteApiOrganizationsHelper::is_member($User, $Model) &&
                 DiscreteApiOrganizationsHelper::can_delete_organization($User, $Model)
-            );
+        );
     }
 
     /**
