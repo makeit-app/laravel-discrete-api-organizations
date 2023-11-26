@@ -10,10 +10,15 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use MakeIT\DiscreteApi\Base\Helpers\DiscreteApiHelpers;
 use MakeIT\DiscreteApi\Organizations\Console\Commands\InstallDiscreteApiOrganizationsCommand;
+use MakeIT\DiscreteApi\Organizations\Contracts\OrganizationsCreateContract;
 use MakeIT\DiscreteApi\Organizations\Contracts\OrganizationsCurrentDeleteContract;
 use MakeIT\DiscreteApi\Organizations\Contracts\OrganizationsCurrentGetContract;
 use MakeIT\DiscreteApi\Organizations\Contracts\OrganizationsCurrentUpdateContract;
 use MakeIT\DiscreteApi\Organizations\Contracts\OrganizationsListContract;
+use MakeIT\DiscreteApi\Organizations\Contracts\OrganizationsSwitchContract;
+
+use MakeIT\DiscreteApi\Organizations\Contracts\WorkspacesListContract;
+
 use MakeIT\DiscreteApi\Organizations\Models\Organization;
 use MakeIT\DiscreteApi\Organizations\Models\Workspace;
 
@@ -131,10 +136,19 @@ class DiscreteApiOrganizationsServiceProvider extends ServiceProvider
         $actions_namespace = config('discreteapiorganizations.route_namespace') === 'app'
             ? DiscreteApiHelpers::compute_namespace(config('discreteapiorganizations')) . 'Actions\\DiscreteApi\\Organizations\\'
             : DiscreteApiHelpers::compute_namespace(config('discreteapiorganizations')) . 'Actions\\';
+        $this->app->singleton(OrganizationsCreateContract::class, $actions_namespace . 'OrganizationsCreateAction');
         $this->app->singleton(OrganizationsCurrentGetContract::class, $actions_namespace . 'OrganizationsCurrentGetAction');
         $this->app->singleton(OrganizationsCurrentUpdateContract::class, $actions_namespace . 'OrganizationsCurrentUpdateAction');
         $this->app->singleton(OrganizationsCurrentDeleteContract::class, $actions_namespace . 'OrganizationsCurrentDeleteAction');
         $this->app->singleton(OrganizationsListContract::class, $actions_namespace . 'OrganizationsListAction');
+        $this->app->singleton(OrganizationsSwitchContract::class, $actions_namespace . 'OrganizationsSwitchAction');
+        // -=-=-=-=-=-=-=-=-=
+        $this->app->singleton(WorkspaceCreateContract::class, $actions_namespace . 'WorkspaceCreateAction');
+        $this->app->singleton(WorkspaceCurrentGetContract::class, $actions_namespace . 'WorkspaceCurrentGetAction');
+        $this->app->singleton(WorkspaceCurrentUpdateContract::class, $actions_namespace . 'WorkspaceCurrentUpdateAction');
+        $this->app->singleton(WorkspaceCurrentDeleteContract::class, $actions_namespace . 'WorkspaceCurrentDeleteAction');
+        $this->app->singleton(WorkspacesListContract::class, $actions_namespace . 'WorkspacesListAction');
+        $this->app->singleton(WorkspaceSwitchContract::class, $actions_namespace . 'WorkspaceSwitchAction');
     }
 
     /**

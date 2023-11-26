@@ -12,7 +12,7 @@ class OrganizationCurrentUpdateController extends BaseDiscreteApiOrganizationsCo
     /**
      * @throws Exception
      */
-    public function __invoke(Request $request): JsonResponse
+    public function __invoke(Request $request): ?JsonResponse
     {
         return app(OrganizationsCurrentUpdateContract::class)->handle($request->user(), $request->only(['title', 'description']));
     }

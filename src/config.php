@@ -39,7 +39,7 @@ return [
      * Limits for monetization
      */
     'limit' => [
-        'organizations' => DiscreteApiOrganizationsHelper::organizatios_limit(),
+        'organizations' => DiscreteApiOrganizationsHelper::organizations_limit(),
         'workspaces' => DiscreteApiOrganizationsHelper::workspaces_limit()
     ],
     /**

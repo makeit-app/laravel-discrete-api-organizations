@@ -5,26 +5,26 @@ namespace MakeIT\DiscreteApi\Organizations\Actions;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Gate;
-use MakeIT\DiscreteApi\Organizations\Contracts\OrganizationsCurrentDeleteContract;
+use MakeIT\DiscreteApi\Organizations\Contracts\WorkspacesCurrentDeleteContract;
 use MakeIT\DiscreteApi\Organizations\Helpers\DiscreteApiOrganizationsHelper;
 
-class OrganizationsCurrentDeleteAction extends OrganizationsCurrentDeleteContract
+class WorkspacesCurrentDeleteAction extends WorkspacesCurrentDeleteContract
 {
     public function handle(User $User): ?JsonResponse
     {
         if (!app()->runningInConsole()) {
             if (!is_null($User->profile)) {
                 $User->profile->load(['organization.workspaces', 'workspace']);
-                if (!is_null($User->profile->organization) && $User->profile->organization->is_personal === true) {
+                if (!is_null($User->profile->organization) && $User->profile->organization->is_personal === true && $User->profile->workspace->is_default === true) {
                     return response()->json([
-                        'message' => __('Unable to remove personal Organization'),
+                        'message' => __('Unable to remove default workspace of personal organization'),
                         'errors' => [
-                            'organization' => __('Unable to remove personal Organization'),
+                            'organization' => __('Unable to remove default workspace of personal organization'),
                         ]
                     ], 403);
                 }
-                Gate::forUser($User)->authorize('delete', $User->profile->organization);
-                $User->profile->organization->delete();
+                Gate::forUser($User)->authorize('delete', $User->profile->workspace);
+                $User->profile->workspace->delete();
                 DiscreteApiOrganizationsHelper::updateProfileOrganization($User);
                 DiscreteApiOrganizationsHelper::updateProfileWorkspace($User);
                 return response()->json(null, 204);

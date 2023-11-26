@@ -13,7 +13,7 @@ class OrganizationSwitchController extends BaseDiscreteApiOrganizationsControlle
     /**
      * @throws Exception
      */
-    public function __invoke(Request $request, Organization $Organization): JsonResponse
+    public function __invoke(Request $request, Organization $Organization): ?JsonResponse
     {
         return app(OrganizationsSwitchContract::class)->handle($request->user(), $Organization);
     }

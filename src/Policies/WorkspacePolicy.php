@@ -31,7 +31,8 @@ class WorkspacePolicy
      */
     public function view(User $User, Model $Model): bool
     {
-        return $User->hasRole(['super', 'admin', 'support']) || DiscreteApiOrganizationsHelper::can_read_organization($User, $Model->organization);
+        return $User->hasRole(['super', 'admin', 'support']) ||
+            DiscreteApiOrganizationsHelper::can_read_organization($User, $Model->organization);
     }
 
     /**
@@ -55,7 +56,7 @@ class WorkspacePolicy
     {
         return $User->hasRole(['super', 'admin', 'support']) || (
             DiscreteApiOrganizationsHelper::is_member($User, $Model->organization) &&
-                DiscreteApiOrganizationsHelper::can_write_organization($User, $Model->organization)
+            DiscreteApiOrganizationsHelper::can_write_organization($User, $Model->organization)
         );
     }
 
@@ -70,7 +71,7 @@ class WorkspacePolicy
     {
         return $User->hasRole(['super', 'admin', 'support']) || (
             DiscreteApiOrganizationsHelper::is_member($User, $Model->organization) &&
-                DiscreteApiOrganizationsHelper::can_delete_organization($User, $Model->organization)
+            DiscreteApiOrganizationsHelper::can_delete_organization($User, $Model->organization)
         );
     }
 

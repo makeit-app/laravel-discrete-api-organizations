@@ -12,7 +12,7 @@ class OrganizationCurrentDeleteController extends BaseDiscreteApiOrganizationsCo
     /**
      * @throws Exception
      */
-    public function __invoke(Request $request): JsonResponse
+    public function __invoke(Request $request): ?JsonResponse
     {
         return app(OrganizationsCurrentDeleteContract::class)->handle($request->user());
     }

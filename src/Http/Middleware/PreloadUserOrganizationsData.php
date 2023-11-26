@@ -20,7 +20,8 @@ class PreloadUserOrganizationsData
                                     return $q->ordered();
                                 }
                             ]);
-                        }
+                        },
+                        'workspace'
                     ]);
                 },
                 'organizations' => function ($q) {

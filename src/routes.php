@@ -6,6 +6,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // user
     // organizations
     Route::prefix('/user/organizations')->group(function () {
+        // store
+        Route::post('/', 'OrganizationCreateController');
         // get list
         Route::get('/list', 'OrganizationsListController');
         // switch to another
@@ -18,6 +20,24 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::put('/', 'OrganizationCurrentUpdateController');
             // delete current
             Route::delete('/', 'OrganizationCurrentDeleteController');
+        });
+        // WORKSPACES
+        Route::prefix('/worspaces')->group(function () {
+            // store
+            Route::post('/', 'WorkspaceCreateController');
+            // get list
+            Route::get('/list', 'WorkspacesListController');
+            // switch to another
+            Route::put('/switch/{workspace}', 'WorkspaceSwitchController');
+            // CURRENT ORGANIZATION MANIPULATIONS
+            Route::prefix('/current')->group(function () {
+                // get current
+                Route::get('/', 'WorkspaceCurrentGetController');
+                // update current
+                Route::put('/', 'WorkspaceCurrentUpdateController');
+                // delete current
+                Route::delete('/', 'WorkspaceCurrentDeleteController');
+            });
         });
     });
 });

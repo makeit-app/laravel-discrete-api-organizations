@@ -7,7 +7,7 @@ use MakeIT\DiscreteApi\Organizations\Models\Organization;
 
 class DiscreteApiOrganizationsHelper
 {
-    public static function organizatios_limit(): int
+    public static function organizations_limit(): int
     {
         /**
          * TODO: Subscription

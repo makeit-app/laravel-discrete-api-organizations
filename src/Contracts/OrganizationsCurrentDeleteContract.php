@@ -7,5 +7,5 @@ use Illuminate\Http\JsonResponse;
 
 abstract class OrganizationsCurrentDeleteContract
 {
-    abstract public function handle(User $User): JsonResponse;
+    abstract public function handle(User $User): ?JsonResponse;
 }

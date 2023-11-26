@@ -6,21 +6,21 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
-use MakeIT\DiscreteApi\Organizations\Contracts\OrganizationsCurrentUpdateContract;
+use MakeIT\DiscreteApi\Organizations\Contracts\WorkspacesCurrentUpdateContract;
 
-class OrganizationsCurrentUpdateAction extends OrganizationsCurrentUpdateContract
+class WorkspacesCurrentUpdateAction extends WorkspacesCurrentUpdateContract
 {
     public function handle(User $User, array $input = []): ?JsonResponse
     {
         if (!app()->runningInConsole()) {
             if (!is_null($User->profile)) {
                 $User->profile->load(['organization.workspaces', 'workspace']);
-                Gate::forUser($User)->authorize('update', $User->profile->organization);
+                Gate::forUser($User)->authorize('update', $User->profile->workspace);
                 Validator::make($input, [
                     'title' => ['required', 'string', 'max:100'],
                     'description' => ['string', 'max:4096'],
-                ])->validateWithBag('updateOrganizationInformation');
-                $User->profile->organization->forceFill([
+                ])->validateWithBag('updateWorkspaceInformation');
+                $User->profile->workspace->forceFill([
                     'title' => $input['title'],
                     'description' => $input['description'],
                 ])->save();

@@ -4,17 +4,17 @@ namespace MakeIT\DiscreteApi\Organizations\Actions;
 
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
-use MakeIT\DiscreteApi\Organizations\Contracts\OrganizationsCurrentGetContract;
+use MakeIT\DiscreteApi\Organizations\Contracts\WorkspacesCurrentGetContract;
 
-class OrganizationsCurrentGetAction extends OrganizationsCurrentGetContract
+class WorkspacesCurrentGetAction extends WorkspacesCurrentGetContract
 {
     public function handle(User $User): ?JsonResponse
     {
         if (!app()->runningInConsole()) {
             if (!is_null($User->profile)) {
                 $User->profile->load(['organization.workspaces', 'workspace']);
-                if (!is_null($User->profile->organization)) {
-                    return response()->json($User->profile->organization->toArray());
+                if(!is_null($User->profile->workspace)) {
+                    return response()->json($User->profile->workspace->toArray());
                 } else {
                     return response()->json([]);
                 }

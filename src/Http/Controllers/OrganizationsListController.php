@@ -12,7 +12,7 @@ class OrganizationsListController extends BaseDiscreteApiOrganizationsController
     /**
      * @throws Exception
      */
-    public function __invoke(Request $request): JsonResponse
+    public function __invoke(Request $request): ?JsonResponse
     {
         return app(OrganizationsListContract::class)->handle($request->user());
     }

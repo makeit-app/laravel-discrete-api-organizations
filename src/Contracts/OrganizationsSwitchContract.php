@@ -8,5 +8,5 @@ use MakeIT\DiscreteApi\Organizations\Models\Organization;
 
 abstract class OrganizationsSwitchContract
 {
-    abstract public function handle(User $User, Organization $Organization): JsonResponse;
+    abstract public function handle(User $User, Organization $Organization): ?JsonResponse;
 }
