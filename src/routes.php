@@ -39,5 +39,8 @@ Route::middleware('auth:sanctum')->group(function () {
                 Route::delete('/', 'WorkspaceCurrentDeleteController');
             });
         });
+        // MEMBERS
+        Route::prefix('/members')->group(function () {
+        });
     });
 });

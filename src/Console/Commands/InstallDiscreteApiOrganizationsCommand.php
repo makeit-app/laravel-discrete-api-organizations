@@ -94,7 +94,11 @@ class InstallDiscreteApiOrganizationsCommand extends Command
         $this->comment('     public function created(Model $model): void');
         $this->comment('     {');
         $this->comment('         //...to the end');
-        $this->comment('         $model->organizations()->create([\'title\' => __(\'Default Organization\'), \'is_personal\' => true]);');
+        $this->comment('         // Creating a dependent organization with associated data...');
+        $this->comment('         app(\MakeIT\DiscreteApi\Organizations\Contracts\OrganizationsCreateContract::class)->handle($model, [');
+        $this->comment('             \'title\' => __(\'Default Organization\'),');
+        $this->comment('             \'description\' => __(\'This is default organizations.This organization is free for your personal use. You can not delete it. You may change this description at any time.\')');
+        $this->comment('         ]);');
         $this->comment('         ');
         $this->newLine(2);
         $this->info('Finally You need to add HasOrganizations Trait to the User Model');

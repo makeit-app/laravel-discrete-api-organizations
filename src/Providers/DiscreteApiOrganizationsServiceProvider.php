@@ -89,12 +89,13 @@ class DiscreteApiOrganizationsServiceProvider extends ServiceProvider
         $parsed = parse_url(config('app.url', 'http://localhost'));
         $domain = $parsed['host'];
         unset($parsed);
+        $ns = DiscreteApiHelpers::compute_namespace(config('discreteapiorganizations'));
         Route::domain($domain)
             ->middleware(['api'])
             ->namespace(
                 config('discreteapiorganizations.route_namespace') === 'app'
-                    ? DiscreteApiHelpers::compute_namespace(config('discreteapiorganizations')) . 'Http\\Controllers\\DiscreteApi\\Organizations'
-                    : DiscreteApiHelpers::compute_namespace(config('discreteapiorganizations')) . 'Http\\Controllers'
+                    ? $ns . 'Http\\Controllers\\DiscreteApi\\Organizations'
+                    : $ns . 'Http\\Controllers'
             )
             ->prefix('api')
             ->group(function () {
@@ -121,7 +122,6 @@ class DiscreteApiOrganizationsServiceProvider extends ServiceProvider
     {
         foreach (config('discreteapiorganizations.observersToRegister') as $Model => $Observer) {
             if (class_exists($Model) && class_exists($Observer)) {
-                /** @noinspection PhpUndefinedMethodInspection */
                 $Model::observe($Observer);
             }
         }
@@ -133,9 +133,10 @@ class DiscreteApiOrganizationsServiceProvider extends ServiceProvider
      */
     protected function configureResponseBindings(): void
     {
+        $ns = DiscreteApiHelpers::compute_namespace(config('discreteapiorganizations'));
         $actions_namespace = config('discreteapiorganizations.route_namespace') === 'app'
-            ? DiscreteApiHelpers::compute_namespace(config('discreteapiorganizations')) . 'Actions\\DiscreteApi\\Organizations\\'
-            : DiscreteApiHelpers::compute_namespace(config('discreteapiorganizations')) . 'Actions\\';
+            ? $ns . 'Actions\\DiscreteApi\\Organizations\\'
+            : $ns . 'Actions\\';
         $this->app->singleton(OrganizationsCreateContract::class, $actions_namespace . 'OrganizationsCreateAction');
         $this->app->singleton(OrganizationsCurrentGetContract::class, $actions_namespace . 'OrganizationsCurrentGetAction');
         $this->app->singleton(OrganizationsCurrentUpdateContract::class, $actions_namespace . 'OrganizationsCurrentUpdateAction');

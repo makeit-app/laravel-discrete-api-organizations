@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection ALL */
 
 namespace MakeIT\DiscreteApi\Organizations\Helpers;
 

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use MakeIT\Utils\Sorter;
 
 class Organization extends Model
@@ -90,9 +91,14 @@ class Organization extends Model
             if (isset($this->pivot)) {
                 return config('discreteapiorganizations.roles')[$this->pivot->role];
             } else {
-                $tmp = request()->user()->organizations()->select(['id', 'organization_id', 'user_id'])->where('organization_id', $this->id)->first();
-                if (!is_null($tmp)) {
-                    return $tmp->role;
+                if (request()->user() instanceof User || request()->user() instanceof Authenticatable) {
+                    $tmp = request()->user()->organizations()->select(['id', 'organization_id', 'user_id'])->where('organization_id', $this->id)->first();
+                    if (!is_null($tmp)) {
+                        return $tmp->role;
+                    }
+                } elseif ($this->is_personal) {
+                    // patch if created for now via observer (?no pivot data at this time)
+                    return config('discreteapiorganizations.roles')[1];
                 }
             }
             return null;
@@ -105,9 +111,14 @@ class Organization extends Model
             if (isset($this->pivot)) {
                 return (int)$this->pivot->role;
             } else {
-                $tmp = request()->user()->organizations()->select(['id', 'organization_id', 'user_id'])->where('organization_id', $this->id)->first();
-                if (!is_null($tmp)) {
-                    return (int)$tmp->role_id;
+                if (request()->user() instanceof User || request()->user() instanceof Authenticatable) {
+                    $tmp = request()->user()->organizations()->select(['id', 'organization_id', 'user_id'])->where('organization_id', $this->id)->first();
+                    if (!is_null($tmp)) {
+                        return (int)$tmp->role_id;
+                    }
+                } elseif ($this->is_personal) {
+                    // patch if created for now via observer (?no pivot data at this time)
+                    return 1;
                 }
             }
             return null;
