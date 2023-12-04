@@ -16,7 +16,7 @@ class WorkspacesListAction extends WorkspacesListContract
                     return $q->ordered()->with([
                         'workspaces' => function ($q) {
                             return $q->ordered();
-                            }
+                        }
                     ]);
                 }
             ]);
