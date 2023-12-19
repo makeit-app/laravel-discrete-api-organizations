@@ -24,6 +24,7 @@ class PreloadUserOrganizationsData
                         'workspace'
                     ]);
                 },
+                'organization_slots',
                 'organizations' => function ($q) {
                     return $q->ordered()->with([
                         'workspaces' => function ($q) {

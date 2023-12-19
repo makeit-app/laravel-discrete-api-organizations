@@ -14,6 +14,8 @@ return new class () extends Migration {
         Schema::create('organizations', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->integer(Sorter::FIELD)->index()->default(1);
+            $table->integer('workspace_slots')->index()->default(config('discreteapiorganizations.limit.workspaces'));
+            $table->integer('member_slots')->index()->default(config('discreteapiorganizations.limit.members'));
             $table->string('title')->index();
             $table->text('description')->nullable();
             $table->boolean('is_personal')->index()->default(false);

@@ -4,10 +4,8 @@ namespace MakeIT\DiscreteApi\Organizations\Actions;
 
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use MakeIT\DiscreteApi\Organizations\Contracts\OrganizationsCreateContract;
-use MakeIT\DiscreteApi\Organizations\Helpers\DiscreteApiOrganizationsHelper;
 use MakeIT\DiscreteApi\Organizations\Models\Organization;
 use MakeIT\Utils\Sorter;
 
@@ -19,11 +17,22 @@ class OrganizationsCreateAction extends OrganizationsCreateContract
         if (!is_null($User->profile)) {
             $User->load(['organizations']);
             $User->profile->load(['organization.workspaces', 'workspace']);
-            Gate::forUser($User)->allowIf($User->organizations()->withTrashed()->count() < DiscreteApiOrganizationsHelper::organizations_limit());
+            $input['limit'] = $User->organizations()->withTrashed()->count();
+            $OSlots = $User->organization_slots;
+            if (!is_null($OSlots)) {
+                $limit = $User->organization_slots->slots;
+            } else {
+                $limit = config('discreteapiorganizations.limit.organizations');
+            }
+            unset($OSlots);
             Validator::make($input, [
+                'limit' => ['integer', 'required', 'lt:' . (int)$limit],
                 'title' => ['required', 'string', 'max:100'],
                 'description' => ['string', 'max:4096'],
+            ], [
+                'limit' => __('You have reached your organization limit (including previously deleted organizations). \nYou can unlock the limit by: \n(a) contacting the support team with a request for final deletion of organizations marked for deletion; \n(b) purchase an additional organization slot; \n(c) wait for 30 days to automated deletion..')
             ])->validateWithBag('createOrganizationInformation');
+            unset($limit);
             $Organization = Organization::create([
                 'title' => $input['title'],
                 'description' => trim($input['description']),
@@ -43,7 +52,7 @@ class OrganizationsCreateAction extends OrganizationsCreateContract
             if ($Organization instanceof Organization) {
                 return response()->json($Organization->toArray());
             } else {
-                return response()->json(null,404);
+                return response()->json(null, 404);
             }
         } else {
             return null;

@@ -10,15 +10,19 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use MakeIT\DiscreteApi\Base\Helpers\DiscreteApiHelpers;
 use MakeIT\DiscreteApi\Organizations\Console\Commands\InstallDiscreteApiOrganizationsCommand;
+use MakeIT\DiscreteApi\Organizations\Contracts\MembersListContract;
 use MakeIT\DiscreteApi\Organizations\Contracts\OrganizationsCreateContract;
 use MakeIT\DiscreteApi\Organizations\Contracts\OrganizationsCurrentDeleteContract;
 use MakeIT\DiscreteApi\Organizations\Contracts\OrganizationsCurrentGetContract;
 use MakeIT\DiscreteApi\Organizations\Contracts\OrganizationsCurrentUpdateContract;
 use MakeIT\DiscreteApi\Organizations\Contracts\OrganizationsListContract;
 use MakeIT\DiscreteApi\Organizations\Contracts\OrganizationsSwitchContract;
-
+use MakeIT\DiscreteApi\Organizations\Contracts\WorkspacesCreateContract;
+use MakeIT\DiscreteApi\Organizations\Contracts\WorkspacesCurrentDeleteContract;
+use MakeIT\DiscreteApi\Organizations\Contracts\WorkspacesCurrentGetContract;
+use MakeIT\DiscreteApi\Organizations\Contracts\WorkspacesCurrentUpdateContract;
 use MakeIT\DiscreteApi\Organizations\Contracts\WorkspacesListContract;
-
+use MakeIT\DiscreteApi\Organizations\Contracts\WorkspacesSwitchContract;
 use MakeIT\DiscreteApi\Organizations\Models\Organization;
 use MakeIT\DiscreteApi\Organizations\Models\Workspace;
 
@@ -60,8 +64,10 @@ class DiscreteApiOrganizationsServiceProvider extends ServiceProvider
     protected function configurePublishing(): void
     {
         if ($this->app->runningInConsole()) {
-            $this->publishes([realpath(__DIR__ . '/../../database/migrations') => base_path('database/migrations')], 'migrations');
-            $this->publishes([realpath(__DIR__ . '/../../lang') => lang_path('vendor/discreteapiorganizations')], 'lang');
+            $this->publishes([
+                realpath(__DIR__ . '/../../lang') => lang_path('vendor/discreteapiorganizations'),
+                realpath(__DIR__ . '/../../database/migrations') => base_path('database/migrations'),
+            ], 'install');
         }
     }
 
@@ -90,15 +96,9 @@ class DiscreteApiOrganizationsServiceProvider extends ServiceProvider
         $domain = $parsed['host'];
         unset($parsed);
         $ns = DiscreteApiHelpers::compute_namespace(config('discreteapiorganizations'));
-        Route::domain($domain)
-            ->middleware(['api'])
-            ->namespace(
-                config('discreteapiorganizations.route_namespace') === 'app'
-                    ? $ns . 'Http\\Controllers\\DiscreteApi\\Organizations'
-                    : $ns . 'Http\\Controllers'
-            )
-            ->prefix('api')
-            ->group(function () {
+        Route::domain($domain)->middleware(['api'])->namespace(
+                config('discreteapiorganizations.route_namespace') === 'app' ? $ns . 'Http\\Controllers\\DiscreteApi\\Organizations' : $ns . 'Http\\Controllers'
+            )->prefix('api')->group(function () {
                 $this->loadRoutesFrom(realpath(__DIR__ . '/../routes.php'));
             });
     }
@@ -134,9 +134,7 @@ class DiscreteApiOrganizationsServiceProvider extends ServiceProvider
     protected function configureResponseBindings(): void
     {
         $ns = DiscreteApiHelpers::compute_namespace(config('discreteapiorganizations'));
-        $actions_namespace = config('discreteapiorganizations.route_namespace') === 'app'
-            ? $ns . 'Actions\\DiscreteApi\\Organizations\\'
-            : $ns . 'Actions\\';
+        $actions_namespace = config('discreteapiorganizations.route_namespace') === 'app' ? $ns . 'Actions\\DiscreteApi\\Organizations\\' : $ns . 'Actions\\';
         $this->app->singleton(OrganizationsCreateContract::class, $actions_namespace . 'OrganizationsCreateAction');
         $this->app->singleton(OrganizationsCurrentGetContract::class, $actions_namespace . 'OrganizationsCurrentGetAction');
         $this->app->singleton(OrganizationsCurrentUpdateContract::class, $actions_namespace . 'OrganizationsCurrentUpdateAction');
@@ -144,12 +142,14 @@ class DiscreteApiOrganizationsServiceProvider extends ServiceProvider
         $this->app->singleton(OrganizationsListContract::class, $actions_namespace . 'OrganizationsListAction');
         $this->app->singleton(OrganizationsSwitchContract::class, $actions_namespace . 'OrganizationsSwitchAction');
         // -=-=-=-=-=-=-=-=-=
-        $this->app->singleton(WorkspaceCreateContract::class, $actions_namespace . 'WorkspaceCreateAction');
-        $this->app->singleton(WorkspaceCurrentGetContract::class, $actions_namespace . 'WorkspaceCurrentGetAction');
-        $this->app->singleton(WorkspaceCurrentUpdateContract::class, $actions_namespace . 'WorkspaceCurrentUpdateAction');
-        $this->app->singleton(WorkspaceCurrentDeleteContract::class, $actions_namespace . 'WorkspaceCurrentDeleteAction');
+        $this->app->singleton(WorkspacesCreateContract::class, $actions_namespace . 'WorkspacesCreateAction');
+        $this->app->singleton(WorkspacesCurrentGetContract::class, $actions_namespace . 'WorkspacesCurrentGetAction');
+        $this->app->singleton(WorkspacesCurrentUpdateContract::class, $actions_namespace . 'WorkspacesCurrentUpdateAction');
+        $this->app->singleton(WorkspacesCurrentDeleteContract::class, $actions_namespace . 'WorkspacesCurrentDeleteAction');
         $this->app->singleton(WorkspacesListContract::class, $actions_namespace . 'WorkspacesListAction');
-        $this->app->singleton(WorkspaceSwitchContract::class, $actions_namespace . 'WorkspaceSwitchAction');
+        $this->app->singleton(WorkspacesSwitchContract::class, $actions_namespace . 'WorkspacesSwitchAction');
+        // -=-=-=-=-=-=-=-=-=
+        $this->app->singleton(MembersListContract::class, $actions_namespace . 'MembersListAction');
     }
 
     /**

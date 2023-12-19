@@ -26,6 +26,7 @@ return [
      */
     'observersToRegister' => [
         \MakeIT\DiscreteApi\Organizations\Models\Organization::class => \MakeIT\DiscreteApi\Organizations\Observers\OrganizationObserver::class,
+        \MakeIT\DiscreteApi\Organizations\Models\OrganizationSlot::class => \MakeIT\DiscreteApi\Organizations\Observers\OrganizationSlotObserver::class,
         \MakeIT\DiscreteApi\Organizations\Models\Workspace::class => \MakeIT\DiscreteApi\Organizations\Observers\WorkspaceObserver::class,
     ],
     /**
@@ -40,7 +41,8 @@ return [
      */
     'limit' => [
         'organizations' => DiscreteApiOrganizationsHelper::organizations_limit(),
-        'workspaces' => DiscreteApiOrganizationsHelper::workspaces_limit()
+        'workspaces' => DiscreteApiOrganizationsHelper::workspaces_limit(),
+        'members' => DiscreteApiOrganizationsHelper::members_limit(),
     ],
     /**
      * Roles for identifying abilities

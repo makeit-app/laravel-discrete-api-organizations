@@ -18,11 +18,9 @@ class WorkspacesCurrentUpdateAction extends WorkspacesCurrentUpdateContract
                 Gate::forUser($User)->authorize('update', $User->profile->workspace);
                 Validator::make($input, [
                     'title' => ['required', 'string', 'max:100'],
-                    'description' => ['string', 'max:4096'],
                 ])->validateWithBag('updateWorkspaceInformation');
                 $User->profile->workspace->forceFill([
                     'title' => $input['title'],
-                    'description' => $input['description'],
                 ])->save();
                 $User->profile->load(['organization.workspaces', 'workspace']);
                 return response()->json(null, 204);

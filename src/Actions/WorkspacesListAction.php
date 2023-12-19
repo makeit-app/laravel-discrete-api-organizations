@@ -18,10 +18,15 @@ class WorkspacesListAction extends WorkspacesListContract
                             return $q->ordered();
                         }
                     ]);
-                }
+                },
+                'workspace'
             ]);
             if (!is_null($User->profile->organization) && $User->profile->organization->workspaces->count() > 0) {
-                return response()->json($User->organization->workspaces->toArray());
+                $Workspace = $User->profile->workspace;
+                $User->profile->organization->workspaces->each(function (&$item) use ($Workspace) {
+                    $item->is_current = $item->id === $Workspace->id;
+                });
+                return response()->json($User->profile->organization->workspaces->toArray());
             } else {
                 return response()->json([]);
             }

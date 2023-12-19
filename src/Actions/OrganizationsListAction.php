@@ -18,8 +18,18 @@ class OrganizationsListAction extends OrganizationsListContract
                             return $q->ordered();
                         }
                     ]);
-                }
+                },
+                'profile.organization.workspaces',
+                'profile.workspace'
             ]);
+            $Organization = $User->profile->organization;
+            $Workspace = $User->profile->workspace;
+            $User->organizations->each(function (&$org) use ($Organization, $Workspace) {
+                $org->is_current = $org->id === $Organization->id;
+                $org->workspaces->each(function (&$space) use ($Workspace) {
+                    $space->is_current = $space->id === $Workspace->id;
+                });
+            });
             return response()->json($User->organizations->toArray());
         }
         return null;

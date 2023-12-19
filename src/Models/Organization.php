@@ -35,6 +35,8 @@ class Organization extends Model
      */
     protected $fillable = [
         Sorter::FIELD,
+        'workspace_slots',
+        'member_slots',
         'title',
         'description',
         'is_personal',
@@ -65,7 +67,6 @@ class Organization extends Model
      */
     protected $appends = [
         'role',
-        'role_id'
     ];
 
     /**
@@ -105,26 +106,6 @@ class Organization extends Model
         });
     }
 
-    public function roleId(): Attribute
-    {
-        return Attribute::get(function (): ?int {
-            if (isset($this->pivot)) {
-                return (int)$this->pivot->role;
-            } else {
-                if (request()->user() instanceof User || request()->user() instanceof Authenticatable) {
-                    $tmp = request()->user()->organizations()->select(['id', 'organization_id', 'user_id'])->where('organization_id', $this->id)->first();
-                    if (!is_null($tmp)) {
-                        return (int)$tmp->role_id;
-                    }
-                } elseif ($this->is_personal) {
-                    // patch if created for now via observer (?no pivot data at this time)
-                    return 1;
-                }
-            }
-            return null;
-        });
-    }
-
     public function scopePersonal(Builder $query, bool $is = true): void
     {
         $query->where('is_personal', $is);
@@ -135,9 +116,9 @@ class Organization extends Model
         $query->orderBy(Sorter::FIELD, Sorter::ASCENDING);
     }
 
-    public function users(): BelongsToMany
+    public function members(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'pivot_organizations_users')->withPivot('role');
+        return $this->belongsToMany(User::class, 'pivot_organizations_users')->withPivot('*');
     }
 
     public function workspaces(): HasMany

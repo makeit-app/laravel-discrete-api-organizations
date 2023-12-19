@@ -2,16 +2,12 @@
 
 namespace MakeIT\DiscreteApi\Organizations\Models;
 
-use Illuminate\Database\Eloquent\Builder;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use MakeIT\Utils\Sorter;
 
-class Workspace extends Model
+class OrganizationSlot extends Model
 {
-    use SoftDeletes;
-
     /**
      * Indicates if the IDs are auto-incrementing.
      *
@@ -23,16 +19,15 @@ class Workspace extends Model
      *
      * @var string
      */
-    protected $table = 'workspaces';
+    protected $table = 'organization_slots';
     /**
      * The attributes that are mass assignable.
      *
      * @var string[]
      */
     protected $fillable = [
-        'title',
-        'is_default',
-        Sorter::FIELD,
+        'user_id',
+        'slots',
     ];
     /**
      * The attributes that should be hidden for serialization.
@@ -42,16 +37,13 @@ class Workspace extends Model
     protected $hidden = [
         'created_at',
         'updated_at',
-        'deleted_at',
     ];
     /**
      * The attributes that should be cast.
      *
      * @var array
      */
-    protected $casts = [
-        'deleted_at' => 'datetime',
-    ];
+    protected $casts = [];
     /**
      * The accessors to append to the model's array form.
      *
@@ -76,24 +68,9 @@ class Workspace extends Model
         return 'string';
     }
 
-    public function scopePersonal(Builder $query, bool $is = true): void
+    public function user(): BelongsTo
     {
-        $query->where('is_personal', $is);
-    }
-
-    public function scopeDefault(Builder $query): void
-    {
-        $query->where('is_default', true);
-    }
-
-    public function scopeOrdered(Builder $query): void
-    {
-        $query->orderBy(Sorter::FIELD, Sorter::ASCENDING);
-    }
-
-    public function organization(): BelongsTo
-    {
-        return $this->belongsTo(Organization::class, 'organization_id');
+        return $this->belongsTo(User::class);
     }
 
 }

@@ -1,17 +1,46 @@
-<?php /** @noinspection ALL */
+<?php
+/** @noinspection ALL */
 
 namespace MakeIT\DiscreteApi\Organizations\Helpers;
 
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Collection;
 use MakeIT\DiscreteApi\Organizations\Models\Organization;
+use MakeIT\DiscreteApi\Organizations\Models\Workspace;
+use MakeIT\Utils\Sorter;
 
 class DiscreteApiOrganizationsHelper
 {
+    public static function reorderOrganizationWorkspaces(Collection|EloquentCollection $Workspaces): mixed
+    {
+        if ($Workspaces->count() > 0) {
+            $x = 1;
+            $Workspaces->each(function (&$item) use ($x) {
+                $item->{Sorter::FIELD} = $x;
+                $x++;
+            });
+        }
+        return $Workspaces;
+    }
+
+    public static function reorderUserOrganizations(Collection|EloquentCollection $Organizations): mixed
+    {
+        if ($Organizations->count() > 0) {
+            $x = 1;
+            $Organizations->each(function (&$item) use ($x) {
+                $item->{Sorter::FIELD} = $x;
+                $x++;
+            });
+        }
+        return $Organizations;
+    }
+
     public static function organizations_limit(): int
     {
         /**
          * TODO: Subscription
-         * - read limits from subscription
+         * if have subscription and logged in - read limits from subscription
          */
         switch (config('app.env')) {
             case 'local':
@@ -26,7 +55,7 @@ class DiscreteApiOrganizationsHelper
     {
         /**
          * TODO: Subscription
-         * - read limits from subscription
+         * if have subscription and logged in - read limits from subscription
          */
         switch (config('app.env')) {
             case 'local':
@@ -34,6 +63,21 @@ class DiscreteApiOrganizationsHelper
             default:
             case 'production':
                 return 1;
+        }
+    }
+
+    public static function members_limit(): int
+    {
+        /**
+         * TODO: Subscription
+         * if have subscription and logged in - read limits from subscription
+         */
+        switch (config('app.env')) {
+            case 'local':
+                return 3;
+            default:
+            case 'production':
+                return 2;
         }
     }
 
@@ -65,34 +109,77 @@ class DiscreteApiOrganizationsHelper
         return false;
     }
 
-    public static function updateProfileOrganization(User $User): void
+    public static function switchTo(User $User, Organization $Organization = null, Workspace $Workspace = null): void
     {
-        $Organizations = $User->organizations()->get();
-        if ($Organizations->count() > 0) {
-            $User->profile->forceFill(['organization_id' => $Organizations->first()->id])->save();
-        } elseif ($Organizations->count() > 1) {
-            if (!is_null($Organizations->where('is_personal', true)->first())) {
-                $User->profile->forceFill(['organization_id' => $Organizations->where('is_personal', true)->first()->id])->save();
+        if (!is_null($Organization) && static::is_member($User, $Organization)) {
+            // switch to the specified org if user is member of it
+            // set profile organization
+            $User->profile->organization_id = $Organization->id;
+            if ($Organization->workspaces->count() > 0) {
+                if (!is_null($Workspace) && in_array($Workspace->id, $Organization->workspaces->pluck('id'))) {
+                    // switch to the workspace of specified org
+                    // set profile workspace
+                    $User->profile->workspace_id = $Workspace->id;
+                } else {
+                    // this is workspace of another organization
+                    // try to switch to its organization
+                    static::switchTo($User, $Workspace->organization, $Workspace);
+                }
             } else {
-                $User->profile->forceFill(['organization_id' => $Organizations->first()->id])->save();
+                // else no workspace - reset
+                // actually both organization and workspace are always there,
+                // but let's close the hole too
+                $User->profile->workspace_id = null;
             }
         } else {
-            $User->profile->forceFill(['organization_id' => null])->save();
-        }
-        $User->profile->load(['organization.workspaces']);
-    }
-
-    public static function updateProfileWorkspace(User $User): void
-    {
-        if (!is_null($User->profile->organization) && $User->profile->organization->workspaces->count() > 0) {
-            $Workspaces = $User->profile->organization->workspaces;
-            if (!is_null($Workspaces->where('is_default', true)->first())) {
-                $User->profile->forceFill(['workspace_id' => $Workspaces->where('is_default', true)->first()->id])->save();
+            // falloff to user's organizations list
+            // find for proper org
+            $Organizations = $User->organizations()->with(['workspaces'])->get();
+            if ($Organizations->count() > 0) {
+                // is there personal organization?
+                if (!is_null($Organizations->where('is_personal', true)->first())) {
+                    // set profile organization
+                    $User->profile->organization_id = $Organizations->where('is_personal', true)->first()->id;
+                    // extract the organization's workspaces
+                    $Workspaces = $Organizations->where('is_personal', true)->first()->workspaces;
+                } else {
+                    // set profile organization
+                    $User->profile->organization_id = $Organizations->first()->id;
+                    // extract the organization's workspaces
+                    $Workspaces = $Organizations->first()->workspaces;
+                }
+                if (!is_null($Workspace) && in_array($Workspace->id, $Workspaces->pluck('id'))) {
+                    // we almost never get here, but we're gonna close this hole anyway
+                    // because in 99.99% of cases it is a random organization from a list of organizations
+                    // accordingly, the workspace is also random...
+                    // switch to the workspace of previously choosed org
+                    // set profile workspace
+                    $User->profile->workspace_id = $Workspace->id;
+                } elseif ($Workspaces->count() > 0) {
+                    // is there default workspace?
+                    if (!is_null($Workspaces->where('is_default', true)->first())) {
+                        // set profile default organization's workspace
+                        $User->profile->workspace_id = $Workspaces->where('is_default', true)->first()->id;
+                    } else {
+                        // set profile first found organization's workspace
+                        $User->profile->workspace_id = $Workspaces->first()->id;
+                    }
+                } else {
+                    // else no workspace - reset
+                    // actually both organization and workspace are always there,
+                    // but let's close the hole too
+                    $User->profile->workspace_id = null;
+                }
             } else {
-                $User->profile->forceFill(['workspace_id' => $Workspaces->first()->id])->save();
+                // actually both organization and workspace are always there,
+                // but let's close the hole too
+                $User->profile->forceFill([
+                    'organization_id' => null,
+                    'workspace_id' => null,
+                ]);
             }
         }
-        $User->profile->forceFill(['workspace_id' => null])->save();
-        $User->profile->load(['workspace']);
+        $User->profile->save();
+        $User->profile->load(['organization.workspaces', 'workspace']);
     }
 }

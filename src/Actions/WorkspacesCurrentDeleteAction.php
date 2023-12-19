@@ -25,8 +25,7 @@ class WorkspacesCurrentDeleteAction extends WorkspacesCurrentDeleteContract
                 }
                 Gate::forUser($User)->authorize('delete', $User->profile->workspace);
                 $User->profile->workspace->delete();
-                DiscreteApiOrganizationsHelper::updateProfileOrganization($User);
-                DiscreteApiOrganizationsHelper::updateProfileWorkspace($User);
+                DiscreteApiOrganizationsHelper::switchTo($User, $User->profile->organization);
                 return response()->json(null, 204);
             }
             return response()->json(null, 404);

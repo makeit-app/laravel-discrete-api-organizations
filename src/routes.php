@@ -22,7 +22,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::delete('/', 'OrganizationCurrentDeleteController');
         });
         // WORKSPACES
-        Route::prefix('/worspaces')->group(function () {
+        Route::prefix('/workspaces')->group(function () {
             // store
             Route::post('/', 'WorkspaceCreateController');
             // get list
@@ -41,6 +41,7 @@ Route::middleware('auth:sanctum')->group(function () {
         });
         // MEMBERS
         Route::prefix('/members')->group(function () {
+            Route::get('/', 'MembersListController');
         });
     });
 });

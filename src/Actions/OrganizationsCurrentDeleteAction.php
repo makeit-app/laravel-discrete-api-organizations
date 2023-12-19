@@ -25,8 +25,7 @@ class OrganizationsCurrentDeleteAction extends OrganizationsCurrentDeleteContrac
                 }
                 Gate::forUser($User)->authorize('delete', $User->profile->organization);
                 $User->profile->organization->delete();
-                DiscreteApiOrganizationsHelper::updateProfileOrganization($User);
-                DiscreteApiOrganizationsHelper::updateProfileWorkspace($User);
+                DiscreteApiOrganizationsHelper::switchTo($User);
                 return response()->json(null, 204);
             }
             return response()->json(null, 404);

@@ -88,18 +88,32 @@ class InstallDiscreteApiOrganizationsCommand extends Command
             }
         }
         $this->newLine();
-        $this->info('To automate the organizations database creation You need to add created() method to the OrganizationObserver class');
-        $this->info('We do not know how You realize the OrganizationObserver class and where is located, therefore You should to find and edit them manually...');
+        $this->info('To automate the organizations database creation You need to add trait to the User class');
+        $this->info('We do not know how You realize the User class and where is located, therefore You should to find and edit them manually...');
+        $this->newLine();
+        $this->comment('     class User extends Authenticatable implements MustVerifyEmail');
+        $this->comment('     {');
+        $this->comment('         //...to the end of use-list');
+        $this->comment('         '.(
+            ($quiz['modify_source_code'])
+                ? 'use \App\Traits\DiscreteApi\Organizations\HasOrganizationSlots;'
+                : 'use \MakeIT\DiscreteApi\Organizations\Traits\HasOrganizationSlots;'
+        ));
+
+        $this->newLine();
+        $this->info('To automate the organizations database creation You need to add created() method to the UserObserver class');
+        $this->info('We do not know how You realize the UserObserver class and where is located, therefore You should to find and edit them manually...');
         $this->newLine();
         $this->comment('     public function created(Model $model): void');
         $this->comment('     {');
         $this->comment('         //...to the end');
+        $this->comment('         $model->organization_slots()->create();');
         $this->comment('         // Creating a dependent organization with associated data...');
         $this->comment('         app(\MakeIT\DiscreteApi\Organizations\Contracts\OrganizationsCreateContract::class)->handle($model, [');
-        $this->comment('             \'title\' => __(\'Default Organization\'),');
-        $this->comment('             \'description\' => __(\'This is default organizations.This organization is free for your personal use. You can not delete it. You may change this description at any time.\')');
+        $this->comment('             \'title\' => __(\'Personal Organization\'),');
+        $this->comment('             \'description\' => __(\'This is Your personal Organization. This Organization is free for Your personal use. You can not delete it. You may change this description at any time.\')');
         $this->comment('         ]);');
-        $this->comment('         ');
+        $this->newLine();
         $this->newLine(2);
         $this->info('Finally You need to add HasOrganizations Trait to the User Model');
         $this->newLine(2);
