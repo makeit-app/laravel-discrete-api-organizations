@@ -62,6 +62,19 @@ class InstallDiscreteApiOrganizationsCommand extends Command
                     if (is_bool($v)) {
                         if ($v) {
                             $this->generateDescendantss();
+                            //
+                            $this->info(
+                                'You need to add a Middleare to the Kernel'
+                            );
+                            $this->newLine();
+                            $this->warn('     \'api\' => .... // to the end of list');
+                            $this->comment('        '.(
+                                ($quiz['modify_source_code'])
+                                    ? '\App\Http\Middleware\DiscreteApi\Organizations\PreloadUserOrganizationsData::class,'
+                                    : '\MakeIT\DiscreteApi\Organizations\Http\Middleware\PreloadUserOrganizationsData::class,'
+                            ));
+                            $this->newLine(2);
+                            //
                         }
                     }
                     $this->_config['route_namespace'] = 'app';

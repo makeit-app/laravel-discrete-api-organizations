@@ -17,7 +17,7 @@ This package must be installed and configured manually AS ROOT PACKAGE before th
 
 `php artisan vendor:publish --provider="MakeIT\\DiscreteApi\\Organizations\\Providers\\DiscreteApiOrganizationsServiceProvider" --tag="install"`
 
-**THEN** (soon)
+**THEN**
 
 `php artisan makeit:discreteapi:organizations:install` - run the installer and follow the instructions
 
