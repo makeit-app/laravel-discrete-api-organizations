@@ -5,13 +5,13 @@ Inscludes: organization->workspaces management
 
 ## Requirements
 
-`composer require make-it-app/laravel-discrete-api-base` - Laravel API for discrete Frontend. Base Version.
+`composer require makeit-app/laravel-discrete-api-base` - Laravel API for discrete Frontend. Base Version.
 Just visit the https://github.com/makeit-app/laravel-discrete-api-base and follow installation instructions.<br>
 This package must be installed and configured manually AS ROOT PACKAGE before this one for the Laravel project, with all due care.
 
 ## Installation
 
-`composer require make-it-app/laravel-discrete-api-organizations`
+`composer require makeit-app/laravel-discrete-api-organizations`
 
 ## Setup
 
