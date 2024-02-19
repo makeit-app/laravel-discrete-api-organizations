@@ -11,8 +11,7 @@ class PreloadUserOrganizationsData
     public function handle(Request $request, Closure $next): Response
     {
         if (auth()->check()) {
-
-            if (method_exists($request->user(), 'organizations')) {
+            if (method_exists($request->user(), 'organizations') && method_exists($request->user()->profile, 'organization')) {
                 $request->user()->load([
                     'profile' => function ($q) {
                         return $q->with([
